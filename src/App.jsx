@@ -6,6 +6,7 @@ import Dashboard from './pages/Dashboard';
 import DevicesMap from './pages/Map';
 import DevicesList from './pages/Devices';
 import About from './pages/About';
+import NotFound from './pages/NotFound';
 
 function App() {
   return (
@@ -19,6 +20,7 @@ function App() {
           <Route path="dispositivos" element={<DevicesList />} />
           <Route path="sobre" element={<About />} />
         </Route>
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </Router>
   );
