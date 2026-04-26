@@ -379,13 +379,30 @@ h1, h2, h3, h4, h5, h6 {
 .status-normal { background: var(--normal); box-shadow: 0 0 8px var(--normal); }
 .status-danger { background: var(--danger); box-shadow: 0 0 8px var(--danger); }
 
-/* Responsive adjustments */
+/* ===========================================
+   LOGIN PAGE
+   =========================================== */
 .login-container {
   display: flex;
   min-height: 100vh;
-  width: 100vw;
+  width: 100%;
+  max-width: 1280px;
+  margin: 0 auto;
+  overflow-x: hidden;
+  position: relative;
+}
+
+/* Gradiente cobre a tela toda mesmo com max-width no container */
+.login-container::before {
+  content: '';
+  position: fixed;
+  inset: 0;
   background-color: var(--bg-primary);
-  background-image: radial-gradient(circle at top right, rgba(0, 210, 255, 0.05), transparent 40%), radial-gradient(circle at bottom left, rgba(16, 98, 185, 0.1), transparent 40%);
+  background-image:
+    radial-gradient(circle at top right, rgba(0, 210, 255, 0.06), transparent 45%),
+    radial-gradient(circle at bottom left, rgba(16, 98, 185, 0.12), transparent 45%);
+  z-index: -1;
+  pointer-events: none;
 }
 
 .login-left {
@@ -393,16 +410,106 @@ h1, h2, h3, h4, h5, h6 {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  padding: 4rem;
+  padding: 4rem 5rem;
   border-right: 1px solid var(--glass-border);
 }
 
 .login-right {
-  width: 480px;
+  width: 500px;
+  flex-shrink: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 2rem;
+  padding: 2.5rem 2.5rem;
+}
+
+/* Estilos do link do GitHub no rodé do card */
+.login-footer-block {
+  text-align: center;
+  margin-top: 2rem;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.login-github-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-top: 0.9rem;
+  color: var(--accent-main);
+  text-decoration: none;
+  font-size: 0.82rem;
+  transition: opacity 0.2s ease;
+}
+
+.login-github-link:hover {
+  opacity: 0.75;
+}
+
+/* === Responsividade === */
+
+/* Tablet (≤ 960px) */
+@media (max-width: 960px) {
+  .login-container {
+    flex-direction: column;
+    align-items: center;
+    padding: 0;
+  }
+
+  .login-left {
+    width: 100%;
+    padding: 2.5rem 2rem 1.5rem;
+    border-right: none;
+    border-bottom: 1px solid var(--glass-border);
+    align-items: center;
+    text-align: center;
+    flex: none;
+  }
+
+  .login-left > div {
+    max-width: 480px;
+    width: 100%;
+  }
+
+  .login-left > div > div:first-child {
+    justify-content: center !important;
+  }
+
+  /* Oculta texto verboso e badge em telas menores */
+  .login-left > div > p,
+  .login-left > div > .glass-panel {
+    display: none;
+  }
+
+  .login-right {
+    width: 100%;
+    max-width: 520px;
+    padding: 2rem 1.5rem 3rem;
+  }
+}
+
+/* Mobile (≤ 576px) */
+@media (max-width: 576px) {
+  .login-left {
+    padding: 2rem 1.25rem 1.25rem;
+  }
+
+  .login-left h1 {
+    font-size: 2rem !important;
+  }
+
+  .login-left h2 {
+    font-size: 1.2rem !important;
+  }
+
+  .login-right {
+    padding: 1.5rem 1rem 2.5rem;
+  }
+
+  .login-right .glass-panel {
+    padding: 1.75rem 1.5rem !important;
+    border-radius: var(--border-radius-sm);
+  }
 }
 
 .map-container {

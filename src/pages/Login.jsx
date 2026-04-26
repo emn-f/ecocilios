@@ -33,6 +33,7 @@ const Login = () => {
           <p style={{ color: 'var(--text-muted)', fontSize: '1.1rem', lineHeight: 1.6, marginBottom: '2rem' }}>
             Sistema inteligente de contenção de resíduos para bueiros. Monitoramento preditivo de enchentes, análise da qualidade da água e gestão em tempo real da infraestrutura pluvial.
           </p>
+          {/* Badge de segurança */}
           <div className="glass-panel" style={{ padding: '1.5rem', display: 'flex', alignItems: 'center', gap: '1rem', backgroundColor: 'var(--success-bg)', borderColor: 'rgba(16, 185, 129, 0.2)' }}>
             <ShieldCheck size={32} color="var(--success)" />
             <div>
@@ -45,7 +46,7 @@ const Login = () => {
 
       {/* Coluna Formulário (Direita) */}
       <div className="login-right">
-        <div className="glass-panel" style={{ padding: '3rem 2.5rem', width: '100%', animation: 'fadeIn 0.6s ease' }}>
+        <div className="glass-panel" style={{ padding: '3rem 3rem', width: '100%', animation: 'fadeIn 0.6s ease' }}>
           <h2 style={{ marginBottom: '0.5rem' }}>Acesso à Central</h2>
           <p style={{ color: 'var(--text-muted)', marginBottom: '2.5rem', fontSize: '0.9rem' }}>Insira suas credenciais da Equipe EcoCílios</p>
           
@@ -91,23 +92,13 @@ const Login = () => {
             </button>
           </form>
 
-          <div style={{ textAlign: 'center', marginTop: '2.5rem', fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+          <div className="login-footer-block">
             <p>Plataforma Restrita • Monitoramento Ambiental V1.0</p>
-            <a 
-              href="https://github.com/emn-f/ecocilios" 
-              target="_blank" 
+            <a
+              href="https://github.com/emn-f/ecocilios"
+              target="_blank"
               rel="noopener noreferrer"
-              style={{ 
-                display: 'inline-flex', 
-                alignItems: 'center', 
-                gap: '0.4rem', 
-                marginTop: '1rem', 
-                color: 'var(--accent-main)', 
-                textDecoration: 'none',
-                transition: 'opacity 0.2s'
-              }}
-              onMouseOver={(e) => e.target.style.opacity = '0.8'}
-              onMouseOut={(e) => e.target.style.opacity = '1'}
+              className="login-github-link"
             >
               <Github size={16} />
               Ver Código no GitHub
