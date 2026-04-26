@@ -509,6 +509,12 @@ h1, h2, h3, h4, h5, h6 {
   margin-bottom: 0;
 }
 
+.about-team-description {
+  color: var(--text-secondary);
+  margin-bottom: 1rem;
+  line-height: 1.6;
+}
+
 .about-team-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
@@ -540,40 +546,6 @@ h1, h2, h3, h4, h5, h6 {
   color: var(--text-primary);
   font-weight: 500;
   padding-right: 0.5rem;
-}
-
-.about-team-popover-btn {
-  margin-top: 0.75rem;
-  border: 1px solid rgba(0, 210, 255, 0.35);
-  background: rgba(0, 210, 255, 0.08);
-  color: var(--accent-main);
-  border-radius: 999px;
-  padding: 0.35rem 0.65rem;
-  font-size: 0.78rem;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.35rem;
-  cursor: pointer;
-}
-
-.about-team-popover-btn:hover {
-  background: rgba(0, 210, 255, 0.16);
-}
-
-.about-team-popover {
-  margin-top: 0.7rem;
-  background: rgba(13, 18, 28, 0.96);
-  border: 1px solid rgba(56, 189, 248, 0.35);
-  border-radius: 0.6rem;
-  padding: 0.7rem 0.8rem;
-  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.28);
-}
-
-.about-team-popover p {
-  margin: 0;
-  color: var(--text-secondary);
-  font-size: 0.83rem;
-  line-height: 1.55;
 }
 
 .about-meta-card {
@@ -620,13 +592,6 @@ h1, h2, h3, h4, h5, h6 {
 
 .about-repo-link:hover {
   transform: translateY(-1px);
-}
-
-.about-note {
-  color: var(--text-muted);
-  font-size: 0.84rem;
-  text-align: center;
-  margin-top: -0.3rem;
 }
 
 @media (max-width: 992px) {

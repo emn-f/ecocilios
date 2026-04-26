@@ -1,42 +1,16 @@
-import React, { useState } from 'react';
-import { Droplets, Users, Leaf, Zap, Github, ExternalLink, Info } from 'lucide-react';
+import React from 'react';
+import { Droplets, Users, Leaf, Zap, Github, ExternalLink } from 'lucide-react';
 
 const About = () => {
-  const [openMember, setOpenMember] = useState(null);
-
   const team = [
-    {
-      name: 'Arthur Pereira Moreira',
-      contribution: 'Impactos socioambientais (Projeto parcial) em coautoria com Gabriel e Joanderson.',
-    },
-    {
-      name: 'Emanuel Arlan Sousa Silva Ferreira',
-      contribution: 'Metodologia e prototipo (Projeto final).',
-    },
-    {
-      name: 'Gabriel Cancio Simplicio dos Santos',
-      contribution: 'Impactos socioambientais (Projeto parcial) em coautoria com Arthur e Joanderson.',
-    },
-    {
-      name: 'Guilherme Luiz de Almeida Santos',
-      contribution: 'Dados estatisticos (Projeto parcial).',
-    },
-    {
-      name: 'Joanderson dos Santos de Almeida',
-      contribution: 'Impactos socioambientais (Projeto parcial) em coautoria com Arthur e Gabriel.',
-    },
-    {
-      name: 'Joao Victor Ferreira Gerson',
-      contribution: 'Propostas semelhantes e cidades inteligentes (Projeto final).',
-    },
-    {
-      name: 'Luis Henrique Batista Souza da Silva Santos',
-      contribution: 'Viabilidade tecnica e custos de implementacao (Projeto final).',
-    },
-    {
-      name: 'Luis Henrique Lourenço das Mercês',
-      contribution: 'Contexto historico (Projeto parcial) e resultados (Projeto final).',
-    },
+    'Arthur Pereira Moreira',
+    'Emanuel Arlan Sousa Silva Ferreira',
+    'Gabriel Cancio Simplicio dos Santos',
+    'Guilherme Luiz de Almeida Santos',
+    'Joanderson dos Santos de Almeida',
+    'Joao Victor Ferreira Gerson',
+    'Luis Henrique Batista Souza da Silva Santos',
+    'Luis Henrique Lourenço das Mercês',
   ];
 
   return (
@@ -98,26 +72,15 @@ const About = () => {
           <Users size={28} className="gradient-text" />
           <h2 className="about-section-title">Equipe EcoCílios</h2>
         </div>
+
+        <p className="about-team-description">
+          Equipe participante da pesquisa, do desenvolvimento e da validacao do prototipo EcoCilios.
+        </p>
         
         <div className="about-team-grid">
-          {team.map((member, index) => (
-            <div key={member.name} className="about-team-card">
-              <p className="about-team-name">{member.name}</p>
-              <button
-                type="button"
-                className="about-team-popover-btn"
-                onClick={() => setOpenMember(openMember === index ? null : index)}
-                aria-expanded={openMember === index}
-              >
-                <Info size={14} />
-                Ver contribuicao
-              </button>
-
-              {openMember === index && (
-                <div className="about-team-popover" role="dialog" aria-label={`Contribuicao de ${member.name}`}>
-                  <p>{member.contribution}</p>
-                </div>
-              )}
+          {team.map((member) => (
+            <div key={member} className="about-team-card">
+              <p className="about-team-name">{member}</p>
             </div>
           ))}
         </div>
@@ -148,10 +111,6 @@ const About = () => {
           <ExternalLink size={16} />
         </a>
       </section>
-
-      <p className="about-note">
-        Avaliacao do processo da pesquisa desenvolvida: equipe em colaboracao (em consolidacao para versao final).
-      </p>
     </div>
   );
 };
