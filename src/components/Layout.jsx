@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Outlet, NavLink, useNavigate } from 'react-router-dom';
-import { LayoutDashboard, MapPinned, Server, LogOut, Droplets, Menu, X } from 'lucide-react';
+import { LayoutDashboard, MapPinned, Server, LogOut, Droplets, Menu, X, Info } from 'lucide-react';
 
 const Layout = () => {
   const navigate = useNavigate();
@@ -55,6 +55,10 @@ const Layout = () => {
           <NavLink to="/dispositivos" onClick={closeMenu} className={({isActive}) => isActive ? 'nav-link active' : 'nav-link'}>
             <Server size={20} />
             Status dos Sensores
+          </NavLink>
+          <NavLink to="/sobre" onClick={closeMenu} className={({isActive}) => isActive ? 'nav-link active' : 'nav-link'}>
+            <Info size={20} />
+            Sobre o Projeto
           </NavLink>
         </nav>
 
