@@ -5,6 +5,7 @@ import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import DevicesMap from './pages/Map';
 import DevicesList from './pages/Devices';
+import About from './pages/About';
 
 function App() {
   return (
@@ -16,6 +17,7 @@ function App() {
           <Route path="dashboard" element={<Dashboard />} />
           <Route path="mapa" element={<DevicesMap />} />
           <Route path="dispositivos" element={<DevicesList />} />
+          <Route path="sobre" element={<About />} />
         </Route>
       </Routes>
     </Router>
