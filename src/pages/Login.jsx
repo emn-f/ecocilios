@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Droplets, ShieldCheck, ArrowRight } from 'lucide-react';
+import { Droplets, ShieldCheck, ArrowRight, Github } from 'lucide-react';
 
 const Login = () => {
   const navigate = useNavigate();
@@ -47,7 +47,7 @@ const Login = () => {
       <div className="login-right">
         <div className="glass-panel" style={{ padding: '3rem 2.5rem', width: '100%', animation: 'fadeIn 0.6s ease' }}>
           <h2 style={{ marginBottom: '0.5rem' }}>Acesso à Central</h2>
-          <p style={{ color: 'var(--text-muted)', marginBottom: '2.5rem', fontSize: '0.9rem' }}>Insira suas credenciais da Gestão Pública</p>
+          <p style={{ color: 'var(--text-muted)', marginBottom: '2.5rem', fontSize: '0.9rem' }}>Insira suas credenciais da Equipe EcoCílios</p>
           
           <form onSubmit={handleLogin}>
             <div className="input-group">
@@ -93,6 +93,25 @@ const Login = () => {
 
           <div style={{ textAlign: 'center', marginTop: '2.5rem', fontSize: '0.8rem', color: 'var(--text-muted)' }}>
             <p>Plataforma Restrita • Monitoramento Ambiental V1.0</p>
+            <a 
+              href="https://github.com/emn-f/ecocilios" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              style={{ 
+                display: 'inline-flex', 
+                alignItems: 'center', 
+                gap: '0.4rem', 
+                marginTop: '1rem', 
+                color: 'var(--accent-main)', 
+                textDecoration: 'none',
+                transition: 'opacity 0.2s'
+              }}
+              onMouseOver={(e) => e.target.style.opacity = '0.8'}
+              onMouseOut={(e) => e.target.style.opacity = '1'}
+            >
+              <Github size={16} />
+              Ver Código no GitHub
+            </a>
           </div>
         </div>
       </div>
