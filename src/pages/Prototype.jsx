@@ -13,22 +13,22 @@ const Prototype = () => {
       {
         id: 'tampa',
         name: 'Tampa Direcionadora',
-        function: 'Canaliza agua e residuos para o interior do dispositivo, reduzindo espalhamento.',
+        function: 'Canaliza água e resíduos para o interior do dispositivo, reduzindo o espalhamento.',
       },
       {
         id: 'cesto',
         name: 'Cesto Coletor Interno',
-        function: 'Retem residuos solidos antes da entrada na rede pluvial principal.',
+        function: 'Retém resíduos sólidos antes da entrada na rede pluvial principal.',
       },
       {
         id: 'sensor',
-        name: 'Modulo IoT (sensorial)',
-        function: 'Monitora nivel de carga, pH e turbidez, enviando dados para o painel digital.',
+        name: 'Modulo IoT (Sensorial)',
+        function: 'Monitora nível de carga, pH e turbidez, enviando dados para o painel digital.',
       },
       {
         id: 'base',
         name: 'Base de Fixacao',
-        function: 'Estrutura de ancoragem para estabilidade mecanica e manutencao segura.',
+        function: 'Estrutura de ancoragem para estabilidade mecânica e manutenção segura.',
       },
     ],
     []
@@ -60,8 +60,8 @@ const Prototype = () => {
   return (
     <div className="prototype-page">
       <div className="prototype-header">
-        <h1>Prototipo Fisico Interativo</h1>
-        <p>Arraste o modelo para explorar em 3D e veja os principais componentes do dispositivo EcoCilios.</p>
+        <h1>Protótipo Físico Interativo</h1>
+        <p>Arraste o modelo para explorar em 3D e visualizar os principais componentes do dispositivo EcoCílios.</p>
       </div>
 
       <div className="prototype-grid">
@@ -73,7 +73,7 @@ const Prototype = () => {
             </div>
             <div className="prototype-toolbar-tag">
               <Layers3 size={16} />
-              Visao explodida
+              Visão explodida
               <button
                 type="button"
                 className={`prototype-switch ${exploded ? 'active' : ''}`}
@@ -153,7 +153,7 @@ const Prototype = () => {
           </div>
 
           <div className="prototype-note">
-            Esta visualizacao representa o conceito funcional do prototipo fisico para comunicacao tecnica e validacao da ideia.
+            Esta visualização representa o conceito funcional do protótipo físico para comunicação técnica e validação da ideia.
           </div>
         </section>
       </div>

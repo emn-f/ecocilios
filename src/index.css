@@ -112,6 +112,7 @@ h1, h2, h3, h4, h5, h6 {
   transition: all 0.2s ease;
   border: none;
   font-family: inherit;
+  text-decoration: none;
 }
 
 .btn-primary {
