@@ -106,6 +106,17 @@ const Prototype = () => {
               >
                 <div className="part-detail lid-opening"></div>
                 <div className="part-detail lid-rim"></div>
+                
+                {selected === 'tampa' && (
+                  <div className="part-label-hud">
+                    <div className="hud-line"></div>
+                    <div className="hud-content">
+                      <span className="hud-tag">ID: TOP-01</span>
+                      <h4>{parts[0].name}</h4>
+                      <p>{parts[0].function}</p>
+                    </div>
+                  </div>
+                )}
               </div>
 
               {/* Cesto Coletor */}
@@ -115,6 +126,17 @@ const Prototype = () => {
               >
                 <div className="part-detail basket-mesh"></div>
                 <div className="part-detail basket-frame"></div>
+
+                {selected === 'cesto' && (
+                  <div className="part-label-hud right">
+                    <div className="hud-line"></div>
+                    <div className="hud-content">
+                      <span className="hud-tag">ID: BSK-02</span>
+                      <h4>{parts[1].name}</h4>
+                      <p>{parts[1].function}</p>
+                    </div>
+                  </div>
+                )}
               </div>
 
               {/* Módulo IoT */}
@@ -125,6 +147,17 @@ const Prototype = () => {
                 <div className="part-detail sensor-screen"></div>
                 <div className="part-detail sensor-led"></div>
                 <div className="part-detail sensor-led second"></div>
+
+                {selected === 'sensor' && (
+                  <div className="part-label-hud">
+                    <div className="hud-line"></div>
+                    <div className="hud-content">
+                      <span className="hud-tag">ID: IOT-03</span>
+                      <h4>{parts[2].name}</h4>
+                      <p>{parts[2].function}</p>
+                    </div>
+                  </div>
+                )}
               </div>
 
               {/* Base de Fixação */}
@@ -136,6 +169,17 @@ const Prototype = () => {
                 <div className="part-detail base-bolt bolt-2"></div>
                 <div className="part-detail base-bolt bolt-3"></div>
                 <div className="part-detail base-bolt bolt-4"></div>
+
+                {selected === 'base' && (
+                  <div className="part-label-hud right">
+                    <div className="hud-line"></div>
+                    <div className="hud-content">
+                      <span className="hud-tag">ID: BAS-04</span>
+                      <h4>{parts[3].name}</h4>
+                      <p>{parts[3].function}</p>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           </div>
