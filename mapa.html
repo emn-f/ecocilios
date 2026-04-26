@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EcoCílios · Mapa de Dispositivos</title>
+  <meta name="description" content="Mapa interativo com a localização de todos os dispositivos EcoCílios monitorados." />
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="js/dados.js"></script>
+  <script src="js/app.js"></script>
+  <style>
+    /* O mapa ocupa o espaço disponível */
+    .map-layout {
+      display: flex;
+      height: calc(100vh - 56px);
+      gap: 0;
+    }
+
+    #mapa-leaflet {
+      flex: 1;
+      border-radius: 0;
+      z-index: 1;
+      background: #0d1419;
+    }
+
+    .map-panel {
+      width: 340px;
+      flex-shrink: 0;
+      background: var(--bg-800);
+      border-left: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .map-panel-header {
+      padding: 20px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .map-panel-title {
+      font-size: 15px; font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 12px;
+    }
+
+    .filter-row { display: flex; flex-direction: column; gap: 8px; }
+
+    .map-panel-body {
+      flex: 1;
+      overflow-y: auto;
+      padding: 12px;
+    }
+
+    .device-card-mini {
+      padding: 12px 14px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border);
+      background: var(--surface-1);
+      cursor: pointer;
+      transition: all var(--transition);
+      margin-bottom: 8px;
+    }
+
+    .device-card-mini:hover {
+      background: var(--surface-2);
+      border-color: var(--eco-600);
+      transform: translateX(3px);
+    }
+
+    .device-card-mini.selected {
+      border-color: var(--eco-500);
+      background: var(--eco-dim);
+      box-shadow: 0 0 0 1px var(--eco-600);
+    }
+
+    .dcm-header {
+      display: flex; align-items: center; gap: 8px; margin-bottom: 6px;
+    }
+
+    .dcm-id {
+      font-size: 11px; font-weight: 700;
+      color: var(--eco-400);
+      font-family: 'Space Grotesk', sans-serif;
+    }
+
+    .dcm-name {
+      font-size: 12px; font-weight: 600;
+      color: var(--text-primary);
+      flex: 1;
+    }
+
+    .dcm-metrics {
+      display: flex; gap: 8px; flex-wrap: wrap;
+    }
+
+    .dcm-metric {
+      font-size: 11px; color: var(--text-muted);
+      display: flex; align-items: center; gap: 3px;
+    }
+
+    .map-top-bar {
+      display: flex; align-items: center;
+      justify-content: space-between; flex-wrap: wrap;
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border);
+      background: var(--bg-800);
+      gap: 10px;
+    }
+
+    .legend-row-map {
+      display: flex; gap: 14px; flex-wrap: wrap;
+    }
+
+    .legend-item-map {
+      display: flex; align-items: center; gap: 6px;
+      font-size: 12px; color: var(--text-secondary);
+    }
+
+    .legend-bullet {
+      width: 10px; height: 10px; border-radius: 50%;
+    }
+
+    /* Info popup customizado */
+    .leaflet-popup-content-wrapper {
+      background: var(--bg-700) !important;
+      border: 1px solid var(--border) !important;
+      color: var(--text-primary) !important;
+      border-radius: var(--radius-md) !important;
+      box-shadow: var(--shadow-card) !important;
+    }
+
+    .leaflet-popup-tip { background: var(--bg-700) !important; }
+
+    .eco-popup { font-family: 'Inter', sans-serif; min-width: 200px; }
+    .eco-popup-title { font-size: 14px; font-weight: 700; margin-bottom: 10px; color: var(--text-primary); }
+    .eco-popup-row { display: flex; justify-content: space-between; margin-bottom: 6px; font-size: 12px; }
+    .eco-popup-label { color: var(--text-muted); }
+    .eco-popup-val { font-weight: 600; color: var(--text-primary); }
+    .eco-popup-btn {
+      display: block; margin-top: 12px; text-align: center;
+      background: var(--grad-eco); color: #fff;
+      padding: 7px; border-radius: var(--radius-sm);
+      text-decoration: none; font-size: 12px; font-weight: 600;
+      cursor: pointer;
+    }
+    .eco-popup-btn:hover { filter: brightness(1.1); }
+
+    /* Mapa tile override para escuro */
+    .leaflet-tile { filter: brightness(0.45) saturate(0.3) hue-rotate(180deg); }
+  </style>
+</head>
+<body class="app-layout">
+  <div id="nav-root"></div>
+
+  <div class="main-content" style="padding:0;display:flex;flex-direction:column;">
+
+    <!-- Topo do mapa -->
+    <div class="map-top-bar">
+      <div>
+        <h1 class="page-title" style="font-size:18px">🗺️ Mapa de Dispositivos</h1>
+        <p class="page-subtitle">Clique em um marcador para ver detalhes do dispositivo</p>
+      </div>
+      <div class="legend-row-map">
+        <div class="legend-item-map"><div class="legend-bullet" style="background:#10b981"></div>Operacional</div>
+        <div class="legend-item-map"><div class="legend-bullet" style="background:#f59e0b"></div>Atenção</div>
+        <div class="legend-item-map"><div class="legend-bullet" style="background:#ef4444"></div>Crítico</div>
+        <div class="legend-item-map"><div class="legend-bullet" style="background:#6366f1"></div>Manutenção</div>
+      </div>
+      <span class="chip" id="mapContagem">8 dispositivos</span>
+    </div>
+
+    <div class="map-layout">
+      <!-- Mapa -->
+      <div id="mapa-leaflet"></div>
+
+      <!-- Painel lateral -->
+      <div class="map-panel">
+        <div class="map-panel-header">
+          <div class="map-panel-title">📡 Dispositivos</div>
+          <div class="filter-row">
+            <input type="search" id="mapSearch" placeholder="Buscar dispositivo..." />
+            <select id="mapFiltro">
+              <option value="">Todos os status</option>
+              <option value="ok">Operacional</option>
+              <option value="atencao">Atenção</option>
+              <option value="critico">Crítico</option>
+              <option value="manutencao">Manutenção</option>
+            </select>
+          </div>
+        </div>
+        <div class="map-panel-body" id="mapLista"></div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Modal de detalhe -->
+  <div id="deviceModal" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.7);align-items:center;justify-content:center;">
+    <div style="background:var(--bg-700);border:1px solid var(--border);border-radius:var(--radius-xl);padding:32px;max-width:480px;width:90%;max-height:90vh;overflow-y:auto;position:relative;" id="modalContent"></div>
+  </div>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      if (!Auth.verificar()) return;
+      renderNav('mapa');
+
+      const { DISPOSITIVOS, STATUS } = window.EcoData;
+    const COR = { ok: '#10b981', atencao: '#f59e0b', critico: '#ef4444', manutencao: '#6366f1' };
+
+    // ── Inicializar Leaflet ──────────────────────────
+    const map = L.map('mapa-leaflet', {
+      center: [-23.5505, -46.6333],
+      zoom: 14,
+      zoomControl: true,
+    });
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '© OpenStreetMap contributors'
+    }).addTo(map);
+
+    // ── Criar ícones customizados ────────────────────
+    function criarIcone(status, nivel) {
+      const cor = COR[status];
+      const anel = nivel > 85 ? '#ef4444' : nivel > 60 ? '#f59e0b' : '#10b981';
+      const svg = `
+        <svg xmlns="http://www.w3.org/2000/svg" width="40" height="50" viewBox="0 0 40 50">
+          <defs>
+            <filter id="shadow">
+              <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="${cor}" flood-opacity="0.6"/>
+            </filter>
+          </defs>
+          <circle cx="20" cy="18" r="14" fill="#0d1419" stroke="${cor}" stroke-width="2.5" filter="url(#shadow)"/>
+          <circle cx="20" cy="18" r="8" fill="${cor}" opacity="0.3"/>
+          <circle cx="20" cy="18" r="4" fill="${cor}"/>
+          <polygon points="20,32 14,26 26,26" fill="${cor}"/>
+        </svg>
+      `;
+      return L.divIcon({
+        html: svg,
+        iconSize: [40, 50],
+        iconAnchor: [20, 50],
+        popupAnchor: [0, -50],
+        className: ''
+      });
+    }
+
+    // ── Adicionar Marcadores ─────────────────────────
+    const markers = {};
+
+    DISPOSITIVOS.forEach(d => {
+      const marker = L.marker([d.lat, d.lng], { icon: criarIcone(d.status, d.nivelLixo) });
+      marker.addTo(map);
+
+      const popupHtml = `
+        <div class="eco-popup">
+          <div class="eco-popup-title">🌿 ${d.id} · ${d.nome.replace('EcoCílio ', '')}</div>
+          <div class="eco-popup-row">
+            <span class="eco-popup-label">Status</span>
+            <span>${Utils.statusBadge(d.status)}</span>
+          </div>
+          <div class="eco-popup-row">
+            <span class="eco-popup-label">🗑️ Nível de Lixo</span>
+            <span class="eco-popup-val" style="color:${Utils.nivelCor(d.nivelLixo)}">${Math.round(d.nivelLixo)}%</span>
+          </div>
+          <div class="eco-popup-row">
+            <span class="eco-popup-label">🧪 pH da Água</span>
+            <span class="eco-popup-val">${d.ph.toFixed(1)}</span>
+          </div>
+          <div class="eco-popup-row">
+            <span class="eco-popup-label">🌊 Turbidez</span>
+            <span class="eco-popup-val">${d.turbidez} NTU</span>
+          </div>
+          <div class="eco-popup-row">
+            <span class="eco-popup-label">📍 Bairro</span>
+            <span class="eco-popup-val">${d.bairro}</span>
+          </div>
+          <a class="eco-popup-btn" onclick="abrirModal('${d.id}')">Ver detalhes completos →</a>
+        </div>
+      `;
+
+      marker.bindPopup(popupHtml, { maxWidth: 280 });
+      marker.on('click', () => {
+        selecionarCard(d.id);
+        map.setView([d.lat, d.lng], 15, { animate: true });
+      });
+      markers[d.id] = marker;
+    });
+
+    // ── Renderizar Lista ─────────────────────────────
+    let filtroStatus = '';
+    let filtroBusca = '';
+    let selecionado = null;
+
+    function renderLista() {
+      const lista = DISPOSITIVOS.filter(d =>
+        (!filtroStatus || d.status === filtroStatus) &&
+        (!filtroBusca || d.nome.toLowerCase().includes(filtroBusca.toLowerCase()) || d.id.toLowerCase().includes(filtroBusca.toLowerCase()) || d.bairro.toLowerCase().includes(filtroBusca.toLowerCase()))
+      );
+
+      document.getElementById('mapContagem').textContent = `${lista.length} de ${DISPOSITIVOS.length} dispositivos`;
+
+      document.getElementById('mapLista').innerHTML = lista.map(d => `
+        <div class="device-card-mini ${selecionado === d.id ? 'selected' : ''}" id="card-${d.id}" onclick="volarParaDevice('${d.id}')">
+          <div class="dcm-header">
+            <span class="dot dot-${d.status}"></span>
+            <span class="dcm-id">${d.id}</span>
+            <span class="dcm-name">${d.bairro}</span>
+            ${Utils.statusBadge(d.status)}
+          </div>
+          <div style="font-size:12px;color:var(--text-secondary);margin-bottom:8px">${d.nome}</div>
+          <div class="dcm-metrics">
+            <span class="dcm-metric">🗑️ <strong style="color:${Utils.nivelCor(d.nivelLixo)}">${Math.round(d.nivelLixo)}%</strong></span>
+            <span class="dcm-metric">🧪 pH ${d.ph.toFixed(1)}</span>
+            <span class="dcm-metric">🌊 ${d.turbidez} NTU</span>
+          </div>
+        </div>
+      `).join('') || '<p style="color:var(--text-muted);text-align:center;padding:20px;font-size:13px">Nenhum dispositivo encontrado.</p>';
+    }
+
+    function selecionarCard(id) {
+      selecionado = id;
+      renderLista();
+      const el = document.getElementById('card-' + id);
+      if (el) el.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+    }
+
+    function volarParaDevice(id) {
+      const d = DISPOSITIVOS.find(x => x.id === id);
+      if (!d) return;
+      selecionarCard(id);
+      map.setView([d.lat, d.lng], 15, { animate: true });
+      setTimeout(() => markers[id].openPopup(), 400);
+    }
+
+    // ── Modal de detalhe ─────────────────────────────
+    function abrirModal(id) {
+      const d = DISPOSITIVOS.find(x => x.id === id);
+      if (!d) return;
+
+      const integrCor = d.integridade > 85 ? 'var(--cor-ok)' : d.integridade > 65 ? 'var(--cor-atencao)' : 'var(--cor-critico)';
+
+      document.getElementById('modalContent').innerHTML = `
+        <button onclick="fecharModal()" style="position:absolute;top:16px;right:16px;background:none;border:none;color:var(--text-muted);font-size:20px;cursor:pointer;">✕</button>
+        <div style="display:flex;align-items:center;gap:14px;margin-bottom:24px;">
+          <div style="width:48px;height:48px;background:var(--grad-eco);border-radius:var(--radius-md);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;">🌿</div>
+          <div>
+            <div style="font-family:'Space Grotesk',sans-serif;font-size:18px;font-weight:700;color:var(--text-primary)">${d.id}</div>
+            <div style="font-size:13px;color:var(--text-muted)">${d.nome} · ${d.bairro}</div>
+          </div>
+          ${Utils.statusBadge(d.status)}
+        </div>
+
+        <div class="divider"></div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px;">
+          <div class="card" style="padding:16px">
+            <div style="font-size:11px;color:var(--text-muted);margin-bottom:6px;text-transform:uppercase">🗑️ Nível de Lixo</div>
+            <div style="font-size:28px;font-weight:700;color:${Utils.nivelCor(d.nivelLixo)}">${Math.round(d.nivelLixo)}%</div>
+            <div class="progress-bar" style="margin-top:8px">
+              <div class="progress-fill" style="width:${d.nivelLixo}%;background:${Utils.nivelCor(d.nivelLixo)}"></div>
+            </div>
+          </div>
+          <div class="card" style="padding:16px">
+            <div style="font-size:11px;color:var(--text-muted);margin-bottom:6px;text-transform:uppercase">🔧 Integridade</div>
+            <div style="font-size:28px;font-weight:700;color:${integrCor}">${d.integridade}%</div>
+            <div class="progress-bar" style="margin-top:8px">
+              <div class="progress-fill" style="width:${d.integridade}%;background:${integrCor}"></div>
+            </div>
+          </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:20px;">
+          <div class="card" style="padding:14px;text-align:center">
+            <div style="font-size:20px;margin-bottom:4px">🧪</div>
+            <div style="font-size:20px;font-weight:700;color:var(--cor-info)">${d.ph.toFixed(1)}</div>
+            <div style="font-size:10px;color:var(--text-muted);margin-top:2px">pH</div>
+          </div>
+          <div class="card" style="padding:14px;text-align:center">
+            <div style="font-size:20px;margin-bottom:4px">🌊</div>
+            <div style="font-size:20px;font-weight:700;color:var(--cor-atencao)">${d.turbidez}</div>
+            <div style="font-size:10px;color:var(--text-muted);margin-top:2px">NTU (Turbidez)</div>
+          </div>
+          <div class="card" style="padding:14px;text-align:center">
+            <div style="font-size:20px;margin-bottom:4px">🌡️</div>
+            <div style="font-size:20px;font-weight:700;color:var(--text-primary)">${d.temperatura}°C</div>
+            <div style="font-size:10px;color:var(--text-muted);margin-top:2px">Temperatura</div>
+          </div>
+        </div>
+
+        <div class="mini-stat"><span class="mini-stat-label">📅 Instalação</span><span class="mini-stat-value">${d.instalacao}</span></div>
+        <div class="mini-stat"><span class="mini-stat-label">🔧 Última Manutenção</span><span class="mini-stat-value">${d.ultimaManutencao}</span></div>
+        <div class="mini-stat"><span class="mini-stat-label">📡 Última Atualização</span><span class="mini-stat-value">${d.ultimaAtualizacao}</span></div>
+        <div class="mini-stat"><span class="mini-stat-label">📦 Total de Coletas</span><span class="mini-stat-value">${d.coletasTotal}</span></div>
+
+        <div style="display:flex;gap:10px;margin-top:20px;">
+          <button class="btn btn-primary" style="flex:1" onclick="fecharModal()">✓ Fechar</button>
+          <a href="dispositivos.html" class="btn btn-secondary">Ver todos →</a>
+        </div>
+      `;
+
+      document.getElementById('deviceModal').style.display = 'flex';
+    }
+
+    function fecharModal() {
+      document.getElementById('deviceModal').style.display = 'none';
+    }
+
+    document.getElementById('deviceModal').addEventListener('click', e => {
+      if (e.target === document.getElementById('deviceModal')) fecharModal();
+    });
+
+    // ── Filtros ──────────────────────────────────────
+    document.getElementById('mapFiltro').addEventListener('change', e => {
+      filtroStatus = e.target.value;
+      renderLista();
+    });
+
+    document.getElementById('mapSearch').addEventListener('input', e => {
+      filtroBusca = e.target.value;
+      renderLista();
+    });
+
+    renderLista();
+
+    // ── Expor para popups ──────────────────────────
+    window.abrirModal = abrirModal;
+    window.fecharModal = fecharModal;
+    window.volarParaDevice = volarParaDevice;
+    }); // DOMContentLoaded
+  </script>
+</body>
+</html>

@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EcoCílios · Relatórios</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <script src="js/dados.js"></script>
+  <script src="js/app.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <style>
+    .report-tabs { display: flex; gap: 6px; margin-bottom: 24px; flex-wrap: wrap; }
+    .report-tab {
+      padding: 8px 18px; border-radius: 20px;
+      background: var(--surface-1); border: 1px solid var(--border);
+      color: var(--text-secondary); font-size: 13px; font-weight: 500;
+      cursor: pointer; transition: all var(--transition);
+    }
+    .report-tab.active {
+      background: var(--eco-dim); border-color: var(--eco-600);
+      color: var(--eco-400); font-weight: 700;
+    }
+    .report-section { display: none; }
+    .report-section.visible { display: block; }
+
+    .chart-high { height: 320px; }
+    .chart-high canvas { max-height: 280px; }
+
+    .ranking-table td, .ranking-table th { padding: 10px 14px; }
+    .rank-num { font-family: 'Space Grotesk',sans-serif; font-weight:700; color: var(--eco-400); font-size: 16px; }
+
+    .export-bar {
+      display: flex; gap: 10px; flex-wrap: wrap;
+      padding: 16px 20px;
+      background: var(--surface-1);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      margin-bottom: 24px;
+      align-items: center;
+    }
+
+    .periodo-chip {
+      padding: 5px 14px; border-radius: 20px;
+      background: var(--surface-1); border: 1px solid var(--border);
+      color: var(--text-muted); font-size: 12px;
+      cursor: pointer; transition: all var(--transition);
+    }
+    .periodo-chip.active {
+      background: var(--eco-dim); border-color: var(--eco-600); color: var(--eco-400);
+    }
+
+    .insight-card {
+      display: flex; gap: 14px; align-items: flex-start;
+      padding: 16px; background: var(--surface-1);
+      border: 1px solid var(--border); border-radius: var(--radius-md);
+    }
+
+    .insight-icon { font-size: 24px; flex-shrink: 0; }
+    .insight-title { font-size: 13px; font-weight: 700; color: var(--text-primary); margin-bottom: 4px; }
+    .insight-text { font-size: 12px; color: var(--text-secondary); line-height: 1.6; }
+  </style>
+</head>
+<body class="app-layout">
+  <div id="nav-root"></div>
+
+  <div class="main-content">
+    <div class="page-inner fade-in">
+
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">📊 Relatórios</h1>
+          <p class="page-subtitle">Análise histórica e indicadores de desempenho da rede EcoCílios</p>
+        </div>
+        <div class="header-actions">
+          <button class="btn btn-secondary" onclick="exportarCSV()">⬇ Exportar CSV</button>
+          <button class="btn btn-primary" onclick="window.print()">🖨️ Imprimir</button>
+        </div>
+      </div>
+
+      <!-- Período -->
+      <div class="export-bar">
+        <span style="font-size:13px;color:var(--text-secondary);font-weight:600">📅 Período:</span>
+        <span class="periodo-chip active" onclick="setPeriodo(this,'24h')">Últimas 24h</span>
+        <span class="periodo-chip" onclick="setPeriodo(this,'7d')">7 dias</span>
+        <span class="periodo-chip" onclick="setPeriodo(this,'30d')">30 dias</span>
+        <span class="periodo-chip" onclick="setPeriodo(this,'90d')">90 dias</span>
+        <div style="flex:1"></div>
+        <span class="chip" id="periodoLabel">07/03/2025 00:00 → 07/03/2025 22:00</span>
+      </div>
+
+      <!-- Abas -->
+      <div class="report-tabs">
+        <button class="report-tab active" onclick="setTab('geral', this)">📈 Visão Geral</button>
+        <button class="report-tab" onclick="setTab('qualidade', this)">💧 Qualidade da Água</button>
+        <button class="report-tab" onclick="setTab('coletas', this)">🚛 Coletas</button>
+        <button class="report-tab" onclick="setTab('ranking', this)">🏆 Ranking</button>
+        <button class="report-tab" onclick="setTab('insights', this)">💡 Insights IA</button>
+      </div>
+
+      <!-- Aba: Visão Geral -->
+      <div class="report-section visible" id="sec-geral">
+        <div class="grid-2" style="margin-bottom:20px">
+          <div class="card chart-high">
+            <div class="card-header">
+              <span class="card-title">📈 Nível de Lixo — Todos os dispositivos</span>
+            </div>
+            <canvas id="chartGeralNivel"></canvas>
+          </div>
+          <div class="card chart-high">
+            <div class="card-header">
+              <span class="card-title">🌊 Turbidez Média</span>
+            </div>
+            <canvas id="chartGeralTurbidez"></canvas>
+          </div>
+        </div>
+        <div class="card chart-high">
+          <div class="card-header">
+            <span class="card-title">📡 Uptime por Dispositivo (%)</span>
+          </div>
+          <canvas id="chartUptime"></canvas>
+        </div>
+      </div>
+
+      <!-- Aba: Qualidade da Água -->
+      <div class="report-section" id="sec-qualidade">
+        <div class="grid-2" style="margin-bottom:20px">
+          <div class="card chart-high">
+            <div class="card-header">
+              <span class="card-title">🧪 pH por Dispositivo</span>
+            </div>
+            <canvas id="chartPHRel"></canvas>
+          </div>
+          <div class="card chart-high">
+            <div class="card-header">
+              <span class="card-title">🌊 Turbidez por Dispositivo (NTU)</span>
+            </div>
+            <canvas id="chartTurbRel"></canvas>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">🌡️ Temperatura — Evolução 24h</span>
+          </div>
+          <canvas id="chartTemp" style="max-height:200px"></canvas>
+        </div>
+      </div>
+
+      <!-- Aba: Coletas -->
+      <div class="report-section" id="sec-coletas">
+        <div class="grid-2" style="margin-bottom:20px">
+          <div class="card chart-high">
+            <div class="card-header">
+              <span class="card-title">📦 Total de Coletas por Dispositivo</span>
+            </div>
+            <canvas id="chartColetas"></canvas>
+          </div>
+          <div class="card chart-high">
+            <div class="card-header">
+              <span class="card-title">📅 Coletas por Mês (2025)</span>
+            </div>
+            <canvas id="chartColetasMes"></canvas>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">📊 Eficiência de Coleta</span>
+          </div>
+          <div class="table-wrapper">
+            <table class="ranking-table">
+              <thead>
+                <tr><th>ID</th><th>Dispositivo</th><th>Coletas Total</th><th>Nível Atual</th><th>Eficiência</th><th>Status</th></tr>
+              </thead>
+              <tbody id="coletasBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Aba: Ranking -->
+      <div class="report-section" id="sec-ranking">
+        <div class="grid-2">
+          <div class="card">
+            <div class="section-title" style="margin-bottom:16px">🏆 Melhores Dispositivos</div>
+            <div id="rankingTop"></div>
+          </div>
+          <div class="card">
+            <div class="section-title" style="margin-bottom:16px">⚠️ Precisam de Atenção</div>
+            <div id="rankingBottom"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Aba: Insights IA -->
+      <div class="report-section" id="sec-insights">
+        <div style="display:flex;flex-direction:column;gap:14px" id="insightsList"></div>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      if (!Auth.verificar()) return;
+      renderNav('relatorios');
+
+      const { DISPOSITIVOS, gerarHistorico } = window.EcoData;
+    const hist = gerarHistorico();
+
+    const chartBaseOpts = {
+      responsive: true, maintainAspectRatio: true,
+      plugins: { legend: { labels: { color: '#94a3b8', font: { size: 11 }, boxWidth: 10 } } },
+      scales: {
+        x: { ticks: { color: '#475569', font: { size: 10 } }, grid: { color: 'rgba(255,255,255,0.04)' } },
+        y: { ticks: { color: '#475569', font: { size: 10 } }, grid: { color: 'rgba(255,255,255,0.06)' } }
+      }
+    };
+
+    const PALETTE = ['#10b981','#38bdf8','#f59e0b','#6366f1','#ef4444','#a78bfa','#fb923c','#34d399'];
+
+    // ── Aba: Visão Geral ──────────────────────────
+    new Chart(document.getElementById('chartGeralNivel'), {
+      type: 'line',
+      data: {
+        labels: hist.horas,
+        datasets: DISPOSITIVOS.map((d, i) => ({
+          label: d.id,
+          data: hist.horas.map(() => Math.round(d.nivelLixo + (Math.random()*20 - 10))),
+          borderColor: PALETTE[i % PALETTE.length],
+          backgroundColor: 'transparent',
+          borderWidth: 1.5, tension: 0.4, pointRadius: 0
+        }))
+      },
+      options: { ...chartBaseOpts, scales: { ...chartBaseOpts.scales, y: { ...chartBaseOpts.scales.y, min: 0, max: 100, ticks: { color: '#475569', font: { size: 10 }, callback: v => v + '%' } } } }
+    });
+
+    new Chart(document.getElementById('chartGeralTurbidez'), {
+      type: 'bar',
+      data: {
+        labels: hist.horas.filter((_,i) => i % 3 === 0),
+        datasets: [{
+          label: 'Turbidez Média (NTU)',
+          data: hist.turbidezMedia.filter((_,i) => i % 3 === 0),
+          backgroundColor: 'rgba(56,189,248,0.5)',
+          borderColor: '#38bdf8',
+          borderWidth: 1,
+          borderRadius: 4
+        }]
+      },
+      options: chartBaseOpts
+    });
+
+    new Chart(document.getElementById('chartUptime'), {
+      type: 'bar',
+      data: {
+        labels: DISPOSITIVOS.map(d => d.id),
+        datasets: [{
+          label: 'Uptime (%)',
+          data: DISPOSITIVOS.map(d => d.status === 'manutencao' ? 72 : d.status === 'critico' ? 85 : d.status === 'atencao' ? 92 : 99),
+          backgroundColor: DISPOSITIVOS.map(d => d.status === 'manutencao' ? 'rgba(99,102,241,0.5)' : d.status === 'critico' ? 'rgba(239,68,68,0.5)' : d.status === 'atencao' ? 'rgba(245,158,11,0.5)' : 'rgba(16,185,129,0.5)'),
+          borderColor: DISPOSITIVOS.map(d => d.status === 'manutencao' ? '#6366f1' : d.status === 'critico' ? '#ef4444' : d.status === 'atencao' ? '#f59e0b' : '#10b981'),
+          borderWidth: 1, borderRadius: 6
+        }]
+      },
+      options: { ...chartBaseOpts, scales: { ...chartBaseOpts.scales, y: { ...chartBaseOpts.scales.y, min: 60, max: 100, ticks: { color: '#475569', font: { size: 10 }, callback: v => v + '%' } } } }
+    });
+
+    // ── Aba: Qualidade ────────────────────────────
+    new Chart(document.getElementById('chartPHRel'), {
+      type: 'bar',
+      data: {
+        labels: DISPOSITIVOS.map(d => d.id),
+        datasets: [
+          { label: 'pH atual', data: DISPOSITIVOS.map(d => d.ph), backgroundColor: DISPOSITIVOS.map(d => d.ph < 6.5 || d.ph > 7.5 ? 'rgba(245,158,11,0.6)' : 'rgba(16,185,129,0.6)'), borderColor: DISPOSITIVOS.map(d => d.ph < 6.5 || d.ph > 7.5 ? '#f59e0b' : '#10b981'), borderWidth: 1, borderRadius: 4 },
+          { label: 'Ideal mín (6.5)', data: DISPOSITIVOS.map(() => 6.5), type: 'line', borderColor: 'rgba(245,158,11,0.4)', borderDash: [4,4], borderWidth: 1, fill: false, pointRadius: 0 },
+          { label: 'Ideal máx (7.5)', data: DISPOSITIVOS.map(() => 7.5), type: 'line', borderColor: 'rgba(245,158,11,0.4)', borderDash: [4,4], borderWidth: 1, fill: false, pointRadius: 0 }
+        ]
+      },
+      options: { ...chartBaseOpts, scales: { ...chartBaseOpts.scales, y: { ...chartBaseOpts.scales.y, min: 4, max: 9 } } }
+    });
+
+    new Chart(document.getElementById('chartTurbRel'), {
+      type: 'bar',
+      data: {
+        labels: DISPOSITIVOS.map(d => d.id),
+        datasets: [{ label: 'Turbidez (NTU)', data: DISPOSITIVOS.map(d => d.turbidez), backgroundColor: DISPOSITIVOS.map(d => d.turbidez > 100 ? 'rgba(239,68,68,0.6)' : d.turbidez > 40 ? 'rgba(245,158,11,0.6)' : 'rgba(16,185,129,0.6)'), borderColor: DISPOSITIVOS.map(d => d.turbidez > 100 ? '#ef4444' : d.turbidez > 40 ? '#f59e0b' : '#10b981'), borderWidth: 1, borderRadius: 4 }]
+      },
+      options: chartBaseOpts
+    });
+
+    new Chart(document.getElementById('chartTemp'), {
+      type: 'line',
+      data: {
+        labels: hist.horas,
+        datasets: [{ label: 'Temperatura Média (°C)', data: hist.horas.map(() => +(21 + Math.random()*5).toFixed(1)), borderColor: '#f59e0b', backgroundColor: 'rgba(245,158,11,0.08)', borderWidth: 2, fill: true, tension: 0.4, pointRadius: 0 }]
+      },
+      options: chartBaseOpts
+    });
+
+    // ── Aba: Coletas ──────────────────────────────
+    new Chart(document.getElementById('chartColetas'), {
+      type: 'bar',
+      data: {
+        labels: DISPOSITIVOS.map(d => d.id),
+        datasets: [{ label: 'Coletas realizadas', data: DISPOSITIVOS.map(d => d.coletasTotal), backgroundColor: 'rgba(52,211,153,0.5)', borderColor: '#34d399', borderWidth: 1, borderRadius: 6 }]
+      },
+      options: chartBaseOpts
+    });
+
+    const meses = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+    new Chart(document.getElementById('chartColetasMes'), {
+      type: 'bar',
+      data: {
+        labels: meses,
+        datasets: [
+          { label: '2024', data: [34,28,41,38,52,47,55,43,49,36,0,0], backgroundColor: 'rgba(99,102,241,0.5)', borderColor: '#6366f1', borderWidth: 1, borderRadius: 4 },
+          { label: '2025', data: [61,58,45,0,0,0,0,0,0,0,0,0], backgroundColor: 'rgba(16,185,129,0.5)', borderColor: '#10b981', borderWidth: 1, borderRadius: 4 }
+        ]
+      },
+      options: { ...chartBaseOpts, plugins: { ...chartBaseOpts.plugins } }
+    });
+
+    document.getElementById('coletasBody').innerHTML = DISPOSITIVOS.map(d => `
+      <tr>
+        <td><strong style="color:var(--eco-400)">${d.id}</strong></td>
+        <td>${d.bairro}</td>
+        <td style="font-weight:700;color:var(--text-primary)">${d.coletasTotal}</td>
+        <td><span style="color:${Utils.nivelCor(d.nivelLixo)};font-weight:700">${Math.round(d.nivelLixo)}%</span></td>
+        <td><span style="color:var(--cor-ok)">${Math.round(d.coletasTotal / 14 * 100) / 100} col/sem</span></td>
+        <td>${Utils.statusBadge(d.status)}</td>
+      </tr>
+    `).join('');
+
+    // ── Aba: Ranking ──────────────────────────────
+    const sorted = [...DISPOSITIVOS].sort((a, b) => {
+      const scoreA = (100 - a.nivelLixo) + a.integridade + (a.ph >= 6.5 && a.ph <= 7.5 ? 30 : 0) + (a.turbidez < 40 ? 20 : 0);
+      const scoreB = (100 - b.nivelLixo) + b.integridade + (b.ph >= 6.5 && b.ph <= 7.5 ? 30 : 0) + (b.turbidez < 40 ? 20 : 0);
+      return scoreB - scoreA;
+    });
+
+    function rankCard(d, pos, isTop) {
+      const score = Math.round((100 - d.nivelLixo) * 0.4 + d.integridade * 0.3 + (d.ph >= 6.5 && d.ph <= 7.5 ? 30 : 10) + (d.turbidez < 40 ? 20 : 5));
+      return `
+        <div class="mini-stat" style="padding:12px 0">
+          <div style="display:flex;align-items:center;gap:10px;flex:1">
+            <span class="rank-num">#${pos}</span>
+            <div>
+              <div style="font-size:13px;font-weight:600;color:var(--text-primary)">${d.id} · ${d.bairro}</div>
+              <div style="font-size:11px;color:var(--text-muted)">${d.nome.replace('EcoCílio ','')}</div>
+            </div>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">
+            ${Utils.statusBadge(d.status)}
+            <span style="font-size:11px;color:${isTop ? 'var(--cor-ok)' : 'var(--cor-critico)'};font-weight:700">${score} pts</span>
+          </div>
+        </div>
+      `;
+    }
+
+    document.getElementById('rankingTop').innerHTML = sorted.slice(0, 4).map((d, i) => rankCard(d, i+1, true)).join('');
+    document.getElementById('rankingBottom').innerHTML = [...sorted].reverse().slice(0, 4).map((d, i) => rankCard(d, sorted.length - i, false)).join('');
+
+    // ── Aba: Insights ─────────────────────────────
+    const insights = [
+      { icone: '🚨', titulo: 'Atenção: Possível Despejo Industrial', texto: 'O dispositivo EC-007 registrou pH 4.8 e turbidez de 210 NTU na Zona Industrial. Esses valores indicam alta probabilidade de despejo irregular de efluente ácido. Recomenda-se acionamento da fiscalização ambiental imediatamente.', tipo: 'critico' },
+      { icone: '🗑️', titulo: 'Coleta Urgente Identificada', texto: 'EC-003 e EC-007 estão com nível de lixo superior a 90%. A coleta imediata é necessária para evitar transbordamento e obstrução do escoamento pluvial. Risco aumentado de enchente em caso de chuva nas próximas 6 horas.', tipo: 'critico' },
+      { icone: '📈', titulo: 'Tendência de Alta no Nível de Lixo', texto: 'O nível médio de lixo da rede subiu 5% nas últimas 24h. A média atual de 56% sugere que serão necessárias de 3 a 5 coletas preventivas nos próximos 2 dias. Recomenda-se adiantar a rota de coleta programada.', tipo: 'atencao' },
+      { icone: '🌊', titulo: 'Qualidade da Água Abaixo do Padrão', texto: '25% dos dispositivos apresentam turbidez acima de 40 NTU (limite de atenção). O dispositivo EC-007 ultrapassou 200 NTU, indicando presença de sólidos suspensos em quantidade crítica, possível indicador de poluição intensa.', tipo: 'atencao' },
+      { icone: '🔧', titulo: 'EC-006 Aguarda Conclusão de Manutenção', texto: 'O dispositivo EC-006 (Trav. Santo André) está em manutenção desde as 18h. A integridade estrutural está em 55%. Estima-se retorno operacional em 12-18h. Sugerido envio de equipe de vistoria para validação.', tipo: 'atencao' },
+      { icone: '✅', titulo: 'EC-004 com Desempenho Exemplar', texto: 'O EcoCílio Parque Verde (EC-004) está com nível de lixo em apenas 15%, pH ideal (7.3) e turbidez baixa (12 NTU). É o dispositivo com maior pontuação de desempenho da rede. Serve como referência de operação ideal.', tipo: 'info' },
+      { icone: '💡', titulo: 'Otimização de Rota Sugerida', texto: 'Com base nos dados atuais, a rota otimizada de coleta para amanhã cedo é: EC-007 → EC-003 → EC-006 → EC-002 → EC-005. Essa sequência reduz em estimados 18% o tempo de deslocamento e prioriza os pontos críticos.', tipo: 'info' },
+    ];
+
+    document.getElementById('insightsList').innerHTML = insights.map(ins => `
+      <div class="insight-card">
+        <span class="insight-icon">${ins.icone}</span>
+        <div>
+          <div class="insight-title">${ins.titulo} ${Utils.statusBadge(ins.tipo === 'info' ? 'ok' : ins.tipo)}</div>
+          <div class="insight-text">${ins.texto}</div>
+        </div>
+      </div>
+    `).join('');
+
+    // ── Controles ─────────────────────────────────
+    function setTab(id, btn) {
+      document.querySelectorAll('.report-section').forEach(s => s.classList.remove('visible'));
+      document.querySelectorAll('.report-tab').forEach(b => b.classList.remove('active'));
+      document.getElementById('sec-' + id).classList.add('visible');
+      btn.classList.add('active');
+    }
+
+    function setPeriodo(el, p) {
+      document.querySelectorAll('.periodo-chip').forEach(c => c.classList.remove('active'));
+      el.classList.add('active');
+      const labels = { '24h': '07/03/2025 00:00 → 07/03/2025 22:00', '7d': '01/03/2025 → 07/03/2025', '30d': '07/02/2025 → 07/03/2025', '90d': '07/12/2024 → 07/03/2025' };
+      document.getElementById('periodoLabel').textContent = labels[p];
+    }
+
+    function exportarCSV() {
+      const headers = 'ID,Nome,Bairro,Status,Nível Lixo (%),pH,Turbidez (NTU),Integridade (%),Alertas,Coletas Total\n';
+      const rows = DISPOSITIVOS.map(d =>
+        `${d.id},"${d.nome}",${d.bairro},${Utils.statusLabel(d.status)},${Math.round(d.nivelLixo)},${d.ph},${d.turbidez},${d.integridade},${d.alertas},${d.coletasTotal}`
+      ).join('\n');
+      const blob = new Blob([headers + rows], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = 'ecocilios-relatorio.csv';
+      a.click(); URL.revokeObjectURL(url);
+    }
+
+    window.setTab = setTab;
+    window.setPeriodo = setPeriodo;
+    window.exportarCSV = exportarCSV;
+    }); // DOMContentLoaded
+  </script>
+</body>
+</html>

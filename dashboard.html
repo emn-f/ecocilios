@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EcoCílios · Dashboard</title>
+  <meta name="description" content="Painel central de monitoramento da rede de bueiros inteligentes EcoCílios." />
+  <link rel="stylesheet" href="css/style.css" />
+  <script src="js/dados.js"></script>
+  <script src="js/app.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <style>
+    .top-bar {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 28px; gap: 12px; flex-wrap: wrap;
+    }
+    .status-live {
+      display: flex; align-items: center; gap: 8px;
+      font-size: 12px; color: var(--text-muted);
+    }
+    .live-dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: var(--cor-ok);
+      box-shadow: 0 0 8px var(--cor-ok);
+      animation: pulse-dot 1.5s infinite;
+    }
+    .chart-card { height: 280px; position: relative; }
+    .chart-card canvas { max-height: 220px; }
+    .alert-list { display: flex; flex-direction: column; gap: 10px; }
+    .rota-item {
+      display: flex; align-items: center; gap: 12px;
+      padding: 10px 14px;
+      background: var(--surface-1);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      font-size: 13px;
+    }
+    .rota-num {
+      width: 24px; height: 24px;
+      background: var(--grad-eco);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 11px; font-weight: 700; color: #fff;
+      flex-shrink: 0;
+    }
+    .rota-info { flex: 1; }
+    .rota-nome { font-weight: 600; color: var(--text-primary); }
+    .rota-bairro { font-size: 11px; color: var(--text-muted); }
+    .mini-stat {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 10px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+      font-size: 13px;
+    }
+    .mini-stat:last-child { border-bottom: none; }
+    .mini-stat-label { color: var(--text-secondary); display: flex; align-items: center; gap: 8px; }
+    .mini-stat-value { font-weight: 600; color: var(--text-primary); }
+    .section-title {
+      font-size: 15px; font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 16px;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .dist-bar {
+      display: flex; gap: 4px;
+      height: 10px; border-radius: 5px;
+      overflow: hidden; margin: 12px 0 6px;
+    }
+    .dist-seg { height: 100%; border-radius: 3px; transition: width 1s ease; }
+    .legend-row { display: flex; gap: 16px; flex-wrap: wrap; margin-top: 8px; }
+    .legend-item { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text-secondary); }
+    .legend-dot { width: 8px; height: 8px; border-radius: 2px; }
+  </style>
+</head>
+<body class="app-layout">
+  <div id="nav-root"></div>
+
+  <div class="main-content">
+    <div class="page-inner fade-in">
+
+      <!-- Top Bar -->
+      <div class="top-bar">
+        <div>
+          <h1 class="page-title">◈ Dashboard</h1>
+          <p class="page-subtitle">Visão geral da rede de monitoramento em tempo real</p>
+        </div>
+        <div class="header-actions">
+          <div class="status-live">
+            <span class="live-dot"></span>
+            <span>Ao vivo · <span id="relogio">--:--:--</span></span>
+          </div>
+          <button class="btn btn-secondary" onclick="location.href='mapa.html'">🗺️ Ver Mapa</button>
+          <button class="btn btn-primary" onclick="location.href='relatorios.html'">📊 Relatórios</button>
+        </div>
+      </div>
+
+      <!-- KPIs -->
+      <div class="kpi-grid stagger" id="kpiGrid"></div>
+
+      <!-- Gráficos principais -->
+      <div class="grid-2" style="margin-bottom:20px">
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">📈 Nível Médio de Lixo (24h)</span>
+            <span class="chip">% capacidade</span>
+          </div>
+          <canvas id="chartNivel"></canvas>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">💧 Qualidade da Água (24h)</span>
+            <span class="chip">pH médio</span>
+          </div>
+          <canvas id="chartPH"></canvas>
+        </div>
+      </div>
+
+      <!-- Linha inferior -->
+      <div class="grid-2" style="margin-bottom:20px">
+        <!-- Distribuição de status -->
+        <div class="card">
+          <div class="section-title">📡 Distribuição por Status</div>
+          <div class="dist-bar" id="distBar"></div>
+          <div class="legend-row" id="distLegend"></div>
+          <div class="divider"></div>
+          <div id="miniStats"></div>
+        </div>
+
+        <!-- Rota de coleta -->
+        <div class="card">
+          <div class="section-title">🚛 Rota de Coleta Prioritária</div>
+          <p style="font-size:12px;color:var(--text-muted);margin-bottom:14px">Sequência otimizada para os dispositivos que necessitam de atenção imediata.</p>
+          <div id="rotaLista"></div>
+        </div>
+      </div>
+
+      <!-- Alertas recentes -->
+      <div class="card">
+        <div class="card-header">
+          <span class="section-title" style="margin-bottom:0">🔔 Alertas Recentes</span>
+          <a href="alertas.html" class="btn btn-secondary" style="font-size:12px;padding:6px 14px;">Ver todos</a>
+        </div>
+        <div class="alert-list" id="alertasDash"></div>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    const { DISPOSITIVOS, ALERTAS, ROTA_COLETA, STATUS, gerarHistorico, calcularKPIs } = window.EcoData;
+
+    // ── KPIs ─────────────────────────────────────
+    function renderKPIs() {
+      const k = calcularKPIs();
+      const grid = document.getElementById('kpiGrid');
+      const cards = [
+        { icon: '📡', value: k.total, label: 'Dispositivos', delta: '↑ 2 este mês', up: true },
+        { icon: '✅', value: k.ok, label: 'Operacionais', delta: `${Math.round(k.ok/k.total*100)}% da rede`, up: true },
+        { icon: '⚠️', value: k.atencao + k.critico, label: 'Requerem Ação', delta: `${k.critico} críticos`, up: false },
+        { icon: '📦', value: k.nivelMedio + '%', label: 'Nível Médio', delta: '↑ 5% vs ontem', up: false },
+        { icon: '🧪', value: k.phMedio, label: 'pH Médio', delta: 'Dentro do ideal', up: true },
+        { icon: '🔔', value: k.alertasAtivos, label: 'Alertas Ativos', delta: 'Não lidos', up: false },
+        { icon: '🔧', value: k.manutencao, label: 'Em Manutenção', delta: 'Em andamento', up: null },
+        { icon: '🌡️', value: '23°C', label: 'Temp. Média', delta: 'Condição normal', up: true },
+      ];
+      grid.innerHTML = cards.map(c => `
+        <div class="kpi-card">
+          <span class="kpi-icon">${c.icon}</span>
+          <div class="kpi-value">${c.value}</div>
+          <div class="kpi-label">${c.label}</div>
+          ${c.up !== null ? `<div class="kpi-delta ${c.up ? 'up' : 'down'}">${c.delta}</div>` : `<div class="kpi-delta" style="color:var(--cor-manutencao)">${c.delta}</div>`}
+        </div>
+      `).join('');
+    }
+
+    // ── Gráficos ──────────────────────────────────
+    const hist = gerarHistorico();
+    const chartDefaults = {
+      responsive: true, maintainAspectRatio: true,
+      plugins: { legend: { display: false } },
+      scales: {
+        x: {
+          ticks: { color: '#475569', font: { size: 10 } },
+          grid: { color: 'rgba(255,255,255,0.04)' }
+        },
+        y: {
+          ticks: { color: '#475569', font: { size: 10 } },
+          grid: { color: 'rgba(255,255,255,0.06)' }
+        }
+      }
+    };
+
+    // Nível de lixo
+    new Chart(document.getElementById('chartNivel'), {
+      type: 'line',
+      data: {
+        labels: hist.horas,
+        datasets: [{
+          data: hist.nivelLixoMedia,
+          borderColor: '#10b981',
+          backgroundColor: 'rgba(16,185,129,0.08)',
+          borderWidth: 2, fill: true, tension: 0.4,
+          pointRadius: 0, pointHoverRadius: 4,
+          pointHoverBackgroundColor: '#10b981'
+        }]
+      },
+      options: { ...chartDefaults, plugins: { ...chartDefaults.plugins }, scales: { ...chartDefaults.scales, y: { ...chartDefaults.scales.y, min: 0, max: 100, ticks: { color: '#475569', font: { size: 10 }, callback: v => v + '%' } } } }
+    });
+
+    // pH
+    new Chart(document.getElementById('chartPH'), {
+      type: 'line',
+      data: {
+        labels: hist.horas,
+        datasets: [
+          {
+            data: hist.phMedia,
+            borderColor: '#38bdf8',
+            backgroundColor: 'rgba(56,189,248,0.08)',
+            borderWidth: 2, fill: true, tension: 0.4,
+            pointRadius: 0, label: 'pH'
+          },
+          {
+            data: hist.horas.map(() => 7.5),
+            borderColor: 'rgba(245,158,11,0.4)',
+            borderWidth: 1, borderDash: [4,4],
+            fill: false, pointRadius: 0, label: 'Limite superior'
+          },
+          {
+            data: hist.horas.map(() => 6.5),
+            borderColor: 'rgba(245,158,11,0.4)',
+            borderWidth: 1, borderDash: [4,4],
+            fill: false, pointRadius: 0, label: 'Limite inferior'
+          }
+        ]
+      },
+      options: {
+        ...chartDefaults,
+        plugins: {
+          legend: {
+            display: true,
+            labels: { color: '#94a3b8', font: { size: 11 }, boxWidth: 12 }
+          }
+        },
+        scales: {
+          ...chartDefaults.scales,
+          y: { ...chartDefaults.scales.y, min: 4, max: 9 }
+        }
+      }
+    });
+
+    // ── Distribuição de Status ──────────────────────
+    function renderDistribuicao() {
+      const k = calcularKPIs();
+      const total = k.total;
+      const dados = [
+        { label: 'Operacional', val: k.ok, cor: '#10b981', pct: Math.round(k.ok/total*100) },
+        { label: 'Atenção', val: k.atencao, cor: '#f59e0b', pct: Math.round(k.atencao/total*100) },
+        { label: 'Crítico', val: k.critico, cor: '#ef4444', pct: Math.round(k.critico/total*100) },
+        { label: 'Manutenção', val: k.manutencao, cor: '#6366f1', pct: Math.round(k.manutencao/total*100) },
+      ];
+      document.getElementById('distBar').innerHTML = dados.map(d =>
+        `<div class="dist-seg" style="width:${d.pct}%;background:${d.cor}"></div>`
+      ).join('');
+      document.getElementById('distLegend').innerHTML = dados.map(d =>
+        `<div class="legend-item"><div class="legend-dot" style="background:${d.cor}"></div>${d.label} (${d.val})</div>`
+      ).join('');
+      document.getElementById('miniStats').innerHTML = `
+        <div class="mini-stat">
+          <span class="mini-stat-label">📦 Coletas necessárias hoje</span>
+          <span class="mini-stat-value">${k.critico + k.atencao}</span>
+        </div>
+        <div class="mini-stat">
+          <span class="mini-stat-label">🧪 pH fora do ideal</span>
+          <span class="mini-stat-value">${window.EcoData.DISPOSITIVOS.filter(d=>d.ph < 6.5 || d.ph > 7.5).length} dispositivos</span>
+        </div>
+        <div class="mini-stat">
+          <span class="mini-stat-label">🌊 Turbidez elevada</span>
+          <span class="mini-stat-value">${window.EcoData.DISPOSITIVOS.filter(d=>d.turbidez > 40).length} dispositivos</span>
+        </div>
+        <div class="mini-stat">
+          <span class="mini-stat-label">⚡ Uptime da rede</span>
+          <span class="mini-stat-value" style="color:var(--cor-ok)">87.5%</span>
+        </div>
+      `;
+    }
+
+    // ── Rota de Coleta ─────────────────────────────
+    function renderRota() {
+      const el = document.getElementById('rotaLista');
+      el.innerHTML = window.EcoData.ROTA_COLETA.map((id, i) => {
+        const d = DISPOSITIVOS.find(x => x.id === id);
+        if (!d) return '';
+        return `
+          <div class="rota-item">
+            <div class="rota-num">${i+1}</div>
+            <div class="rota-info">
+              <div class="rota-nome">${d.id} · ${d.nome.replace('EcoCílio ', '')}</div>
+              <div class="rota-bairro">${d.bairro} · Nível: ${Math.round(d.nivelLixo)}%</div>
+            </div>
+            ${Utils.statusBadge(d.status)}
+          </div>
+        `;
+      }).join('');
+    }
+
+    // ── Alertas ────────────────────────────────────
+    function renderAlertas() {
+      const el = document.getElementById('alertasDash');
+      const lista = ALERTAS.slice(0, 5);
+      el.innerHTML = lista.map(a => `
+        <div class="alert-item ${!a.lido ? 'nao-lido' : ''} ${!a.lido && a.tipo === 'atencao' ? 'atencao' : ''}">
+          <span class="alert-icon">${a.icone}</span>
+          <div style="flex:1">
+            <div class="alert-titulo">${a.titulo} <span class="chip" style="margin-left:6px">${a.dispositivo}</span></div>
+            <div class="alert-desc">${a.descricao}</div>
+            <div class="alert-meta">${Utils.ago(a.hora)} ${!a.lido ? '· <strong style="color:var(--cor-critico)">Não lido</strong>' : ''}</div>
+          </div>
+          ${Utils.statusBadge(a.tipo === 'info' ? 'ok' : a.tipo)}
+        </div>
+      `).join('');
+    }
+
+    // ── Init ───────────────────────────────────────
+    document.addEventListener('DOMContentLoaded', () => {
+      if (!Auth.verificar()) return;
+      renderNav('dashboard');
+      iniciarRelogio('relogio');
+      renderKPIs();
+      renderDistribuicao();
+      renderRota();
+      renderAlertas();
+      // Simular atualização a cada 15s
+      setInterval(() => {
+        simularAtualizacao();
+        renderKPIs();
+        renderDistribuicao();
+      }, 15000);
+    });
+  </script>
+</body>
+</html>
