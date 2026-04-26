@@ -65,7 +65,7 @@ const Layout = () => {
         <div className="sidebar-footer">
           <div className="sidebar-profile">
             <div className="sidebar-avatar">
-              EE
+              <Droplets size={20} />
             </div>
             <div className="sidebar-profile-info">
               <p className="sidebar-profile-name">Equipe EcoCílios</p>
