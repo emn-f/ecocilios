@@ -93,7 +93,7 @@ const Login = () => {
           </form>
 
           <div className="login-footer-block">
-            <p>Plataforma Restrita • Monitoramento Ambiental V1.0</p>
+            <p>Monitoramento Ambiental v1.0</p>
             <a
               href="https://github.com/emn-f/ecocilios"
               target="_blank"
