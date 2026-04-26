@@ -22,12 +22,12 @@ const Prototype = () => {
       },
       {
         id: 'sensor',
-        name: 'Modulo IoT (Sensorial)',
+        name: 'Módulo IoT (Sensorial)',
         function: 'Monitora nível de carga, pH e turbidez, enviando dados para o painel digital.',
       },
       {
         id: 'base',
-        name: 'Base de Fixacao',
+        name: 'Base de Fixação',
         function: 'Estrutura de ancoragem para estabilidade mecânica e manutenção segura.',
       },
     ],

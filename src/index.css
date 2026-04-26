@@ -827,11 +827,14 @@ h1, h2, h3, h4, h5, h6 {
 .proto-base {
   top: 290px;
   width: 220px;
-  height: 30px;
+  height: 40px; /* Aumentado de 30px para 40px */
   background: #2d3748;
   border-radius: 4px;
-  transform: translateX(-50%) translateZ(-15px);
+  transform: translateX(-50%) translateZ(0px); /* Trazido para Z:0 para evitar ser coberto */
   border: 1px solid #1a202c;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .base-bolt {
@@ -839,6 +842,7 @@ h1, h2, h3, h4, h5, h6 {
   background: radial-gradient(circle at 30% 30%, #718096, #2d3748);
   border-radius: 50%;
   border: 1px solid #1a202c;
+  pointer-events: none; /* Garante que o clique passe para a base */
 }
 
 .bolt-1 { top: 5px; left: 15px; }
