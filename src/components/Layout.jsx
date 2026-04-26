@@ -45,23 +45,23 @@ const Layout = () => {
         </div>
 
         <nav className="nav-links">
-          <NavLink to="/app/dashboard" onClick={closeMenu} className={({isActive}) => isActive ? 'nav-link active' : 'nav-link'}>
+          <NavLink to="/app/dashboard" onClick={closeMenu} className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>
             <LayoutDashboard size={20} />
-            Visão Geral
+            Dashboard
           </NavLink>
-          <NavLink to="/app/mapa" onClick={closeMenu} className={({isActive}) => isActive ? 'nav-link active' : 'nav-link'}>
+          <NavLink to="/app/mapa" onClick={closeMenu} className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>
             <MapPinned size={20} />
             Mapeamento Físico
           </NavLink>
-          <NavLink to="/app/dispositivos" onClick={closeMenu} className={({isActive}) => isActive ? 'nav-link active' : 'nav-link'}>
+          <NavLink to="/app/dispositivos" onClick={closeMenu} className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>
             <Server size={20} />
             Status dos Sensores
           </NavLink>
-          <NavLink to="/app/prototipo" onClick={closeMenu} className={({isActive}) => isActive ? 'nav-link active' : 'nav-link'}>
+          <NavLink to="/app/prototipo" onClick={closeMenu} className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>
             <Cuboid size={20} />
             Prototipo 3D
           </NavLink>
-          <NavLink to="/app/sobre" onClick={closeMenu} className={({isActive}) => isActive ? 'nav-link active' : 'nav-link'}>
+          <NavLink to="/app/sobre" onClick={closeMenu} className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>
             <Info size={20} />
             Sobre o Projeto
           </NavLink>
@@ -85,7 +85,7 @@ const Layout = () => {
       </aside>
 
       <main className="main-content">
-        <header className="topbar glass-panel">
+        <header className="topbar">
           <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: '1rem' }}>
             <button className="mobile-menu-btn" onClick={() => setMenuOpen(!menuOpen)}>
               <Menu size={24} />
@@ -100,8 +100,7 @@ const Layout = () => {
           <div className="topbar-profile" title={`Monitorando: ${municipio}, BA`}>
             <MapPin size={16} color="var(--accent-main)" />
             <span>
-              {municipio}
-              <span className="desktop-only">, BA</span>
+              {municipio}, BA
             </span>
           </div>
         </header>
