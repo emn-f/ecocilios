@@ -1,4 +1,5 @@
-# EcoCílios - Biomimética e Prevenção Inteligente de Enchentes Urbanas
+# Projeto EcoCílios
+> Biomimética e Prevenção Inteligente de Enchentes Urbanas
 
 ## 🌱 Sobre o Projeto
 
@@ -23,7 +24,6 @@ O EcoCílios funciona como:
    - Otimização de recursos públicos
    - Proteção de serviços ecossistêmicos urbanos
 
----
 
 ## 🚀 Tecnologias Utilizadas
 
@@ -31,7 +31,6 @@ O EcoCílios funciona como:
 - **Roteamento**: React Router
 - **Deploy**: Vercel
 
----
 
 ## 📦 Instalação e Uso
 
@@ -59,7 +58,6 @@ npm run dev
 npm run build
 ```
 
----
 
 ## 🗂️ Estrutura do Projeto
 
@@ -67,12 +65,15 @@ npm run build
 ecocilios/
 ├── src/
 │   ├── components/
-│   │   └── Layout.jsx       # Layout principal da aplicação
+│   │   └── Layout.jsx       # Layout principal (sidebar + topbar)
 │   ├── pages/
 │   │   ├── Login.jsx        # Tela de login
-│   │   ├── Dashboard.jsx    # Dashboard principal
-│   │   ├── Map.jsx          # Mapa de dispositivos
-│   │   └── Devices.jsx      # Lista de dispositivos
+│   │   ├── Dashboard.jsx    # Dashboard principal com KPIs
+│   │   ├── Map.jsx          # Mapa interativo de dispositivos
+│   │   ├── Devices.jsx      # Lista e gestão de dispositivos
+│   │   ├── About.jsx        # Informações sobre o projeto e equipe
+│   │   ├── Prototype.jsx    # Protótipo 3D interativo do EcoCilios
+│   │   └── NotFound.jsx     # Página 404
 │   ├── data/
 │   │   └── mockData.js      # Dados simulados para prototipagem
 │   ├── App.jsx              # Componente raiz com roteamento
@@ -83,15 +84,17 @@ ecocilios/
 └── README.md                # Este arquivo
 ```
 
----
-
 ## 🔐 Acesso
 
 **URL**: https://ecocilios.vercel.app/
 
-Ao acessar, você será redirecionado para a tela de **Login**. Use credenciais de teste para explorar o protótipo.
+Ao acessar, você será redirecionado para a tela de **Login**. Use as credenciais abaixo para explorar o protótipo:
 
----
+| Campo | Valor |
+|---|---|
+| Identificação | `eco` |
+| Senha | `cilios` |
+
 
 ## 📋 Funcionalidades Prototipadas
 
@@ -100,8 +103,9 @@ Ao acessar, você será redirecionado para a tela de **Login**. Use credenciais 
 - ✅ Mapa interativo de dispositivos
 - ✅ Lista de dispositivos conectados
 - ✅ Monitoramento em tempo real (dados simulados)
+- ✅ Página "Sobre o Projeto" com informações da equipe
+- ✅ Protótipo 3D interativo do dispositivo EcoCilios
 
----
 
 ## 👥 Autores
 
@@ -117,18 +121,15 @@ Ao acessar, você será redirecionado para a tela de **Login**. Use credenciais 
 **Instituição**: Universidade Católica do Salvador
 **Período**: 2026.1
 
----
 
 ## 📄 Licença
 
 Este projeto é um protótipo acadêmico desenvolvido como atividade extensionista.
 
----
 
 ## 📞 Contato & Suporte
 
 Para dúvidas ou sugestões sobre o projeto, abra uma issue no repositório.
 
----
 
 **Nota**: Este é um protótipo em desenvolvimento. Dados exibidos na plataforma são simulados para fins de demonstração.
