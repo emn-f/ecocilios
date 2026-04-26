@@ -82,7 +82,7 @@ const DevicesMap = () => {
         {/* Detalhe do Bueiro */}
         <div className="map-details">
           {selectedPin ? (
-            <div className="glass-panel" style={{ padding: '1.5rem', animation: 'fadeIn 0.3s ease', height: '100%' }}>
+            <div className="glass-panel" style={{ padding: '1.5rem', animation: 'fadeIn 0.3s ease', height: '100%', overflowY: 'auto' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1.5rem' }}>
                 <div>
                   <h3 style={{ fontSize: '1.2rem', marginBottom: '0.2rem' }}>{selectedPin.id}</h3>

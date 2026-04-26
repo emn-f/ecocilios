@@ -1,15 +1,20 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Outlet, NavLink, useNavigate } from 'react-router-dom';
-import { LayoutDashboard, MapPinned, Server, LogOut, Droplets, Menu, X, Info, Cuboid } from 'lucide-react';
+import { LayoutDashboard, MapPinned, Server, LogOut, Droplets, Menu, X, Info, Cuboid, MapPin } from 'lucide-react';
 
 const Layout = () => {
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [municipio, setMunicipio] = useState('Salvador');
   const sidebarRef = useRef(null);
 
+  useEffect(() => {
+    const m = localStorage.getItem('municipio');
+    if (m) setMunicipio(m);
+  }, []);
+
   const handleLogout = () => {
-    // Simula logout e vai pra login
-    navigate('/login');
+    navigate('/');
   };
 
   const closeMenu = () => setMenuOpen(false);
@@ -17,17 +22,13 @@ const Layout = () => {
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (menuOpen && sidebarRef.current && !sidebarRef.current.contains(event.target)) {
-        // Prevent closing if we clicked the hamburger menu button
         if (!event.target.closest('.mobile-menu-btn')) {
           closeMenu();
         }
       }
     };
-
     document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
+    return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [menuOpen]);
 
   return (
@@ -42,25 +43,25 @@ const Layout = () => {
             <X size={24} />
           </button>
         </div>
-        
+
         <nav className="nav-links">
-          <NavLink to="/dashboard" onClick={closeMenu} className={({isActive}) => isActive ? 'nav-link active' : 'nav-link'}>
+          <NavLink to="/app/dashboard" onClick={closeMenu} className={({isActive}) => isActive ? 'nav-link active' : 'nav-link'}>
             <LayoutDashboard size={20} />
             Visão Geral
           </NavLink>
-          <NavLink to="/mapa" onClick={closeMenu} className={({isActive}) => isActive ? 'nav-link active' : 'nav-link'}>
+          <NavLink to="/app/mapa" onClick={closeMenu} className={({isActive}) => isActive ? 'nav-link active' : 'nav-link'}>
             <MapPinned size={20} />
             Mapeamento Físico
           </NavLink>
-          <NavLink to="/dispositivos" onClick={closeMenu} className={({isActive}) => isActive ? 'nav-link active' : 'nav-link'}>
+          <NavLink to="/app/dispositivos" onClick={closeMenu} className={({isActive}) => isActive ? 'nav-link active' : 'nav-link'}>
             <Server size={20} />
             Status dos Sensores
           </NavLink>
-          <NavLink to="/prototipo" onClick={closeMenu} className={({isActive}) => isActive ? 'nav-link active' : 'nav-link'}>
+          <NavLink to="/app/prototipo" onClick={closeMenu} className={({isActive}) => isActive ? 'nav-link active' : 'nav-link'}>
             <Cuboid size={20} />
             Prototipo 3D
           </NavLink>
-          <NavLink to="/sobre" onClick={closeMenu} className={({isActive}) => isActive ? 'nav-link active' : 'nav-link'}>
+          <NavLink to="/app/sobre" onClick={closeMenu} className={({isActive}) => isActive ? 'nav-link active' : 'nav-link'}>
             <Info size={20} />
             Sobre o Projeto
           </NavLink>
@@ -84,7 +85,7 @@ const Layout = () => {
       </aside>
 
       <main className="main-content">
-        <header className="topbar glass-panel" style={{ borderRadius: 0, borderTop: 'none', borderLeft: 'none', borderRight: 'none', position: 'sticky', top: 0, zIndex: 10 }}>
+        <header className="topbar glass-panel">
           <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: '1rem' }}>
             <button className="mobile-menu-btn" onClick={() => setMenuOpen(!menuOpen)}>
               <Menu size={24} />
@@ -93,6 +94,15 @@ const Layout = () => {
               <Droplets className="gradient-text" size={24} />
               <span style={{ fontSize: '1.2rem', fontWeight: 700 }}>EcoCílios</span>
             </div>
+          </div>
+
+          {/* Município selecionado */}
+          <div className="topbar-profile" title={`Monitorando: ${municipio}, BA`}>
+            <MapPin size={16} color="var(--accent-main)" />
+            <span>
+              {municipio}
+              <span className="desktop-only">, BA</span>
+            </span>
           </div>
         </header>
 

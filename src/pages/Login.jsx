@@ -7,14 +7,23 @@ const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const [municipio, setMunicipio] = useState('Salvador');
+
+  const municipiosRMS = [
+    'Salvador',
+    'Camaçari',
+    'Lauro de Freitas',
+    'Simões Filho',
+    'Mata de São João',
+  ];
 
   const handleLogin = (e) => {
     e.preventDefault();
     setLoading(true);
-    // Simula tempo de rede
+    localStorage.setItem('municipio', municipio);
     setTimeout(() => {
       setLoading(false);
-      navigate('/dashboard');
+      navigate('/app/dashboard');
     }, 1200);
   };
 
@@ -78,15 +87,28 @@ const Login = () => {
               />
             </div>
 
+            <div className="input-group" style={{ marginTop: '0.25rem' }}>
+              <label className="input-label">Município</label>
+              <select
+                className="input-field login-select"
+                value={municipio}
+                onChange={(e) => setMunicipio(e.target.value)}
+              >
+                {municipiosRMS.map((m) => (
+                  <option key={m} value={m}>{m}</option>
+                ))}
+              </select>
+            </div>
+
             <button 
               type="submit" 
               className="btn btn-primary" 
               style={{ width: '100%', marginTop: '1.5rem', padding: '1rem' }}
               disabled={loading}
             >
-              {loading ? 'Autenticando modo seguro...' : (
+              {loading ? '🌱 Conectando à rede EcoCílios...' : (
                 <>
-                  Entrar no Painel <ArrowRight size={18} />
+                  Acessar Painel <ArrowRight size={18} />
                 </>
               )}
             </button>

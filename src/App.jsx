@@ -13,9 +13,8 @@ function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/login" element={<Login />} />
-        <Route path="/" element={<Navigate to="/login" replace />} />
-        <Route path="/" element={<Layout />}>
+        <Route path="/" element={<Login />} />
+        <Route path="/app" element={<Layout />}>
           <Route path="dashboard" element={<Dashboard />} />
           <Route path="mapa" element={<DevicesMap />} />
           <Route path="dispositivos" element={<DevicesList />} />
