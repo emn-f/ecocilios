@@ -65,11 +65,11 @@ const Layout = () => {
         <div className="sidebar-footer">
           <div className="sidebar-profile">
             <div className="sidebar-avatar">
-              GM
+              EE
             </div>
             <div className="sidebar-profile-info">
-              <p className="sidebar-profile-name">Gestão Municipal</p>
-              <p className="sidebar-profile-role">Defesa Civil</p>
+              <p className="sidebar-profile-name">Equipe EcoCílios</p>
+              <p className="sidebar-profile-role">Pesquisa e Desenvolvimento</p>
             </div>
           </div>
           <button className="btn btn-outline sidebar-logout" onClick={handleLogout}>
