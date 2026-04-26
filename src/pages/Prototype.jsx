@@ -99,17 +99,43 @@ const Prototype = () => {
               className="prototype-model"
               style={{ transform: `rotateX(${rotation.x}deg) rotateY(${rotation.y}deg) scale(${zoom})` }}
             >
-              <div className={`proto-part proto-top ${selected === 'tampa' ? 'selected' : ''} ${exploded ? 'exploded' : ''}`} onClick={() => setSelected('tampa')}>
-                Tampa
+              {/* Tampa Direcionadora */}
+              <div 
+                className={`proto-part proto-top ${selected === 'tampa' ? 'selected' : ''} ${exploded ? 'exploded' : ''}`} 
+                onClick={() => setSelected('tampa')}
+              >
+                <div className="part-detail lid-opening"></div>
+                <div className="part-detail lid-rim"></div>
               </div>
-              <div className={`proto-part proto-basket ${selected === 'cesto' ? 'selected' : ''} ${exploded ? 'exploded' : ''}`} onClick={() => setSelected('cesto')}>
-                Cesto
+
+              {/* Cesto Coletor */}
+              <div 
+                className={`proto-part proto-basket ${selected === 'cesto' ? 'selected' : ''} ${exploded ? 'exploded' : ''}`} 
+                onClick={() => setSelected('cesto')}
+              >
+                <div className="part-detail basket-mesh"></div>
+                <div className="part-detail basket-frame"></div>
               </div>
-              <div className={`proto-part proto-sensor ${selected === 'sensor' ? 'selected' : ''} ${exploded ? 'exploded' : ''}`} onClick={() => setSelected('sensor')}>
-                IoT
+
+              {/* Módulo IoT */}
+              <div 
+                className={`proto-part proto-sensor ${selected === 'sensor' ? 'selected' : ''} ${exploded ? 'exploded' : ''}`} 
+                onClick={() => setSelected('sensor')}
+              >
+                <div className="part-detail sensor-screen"></div>
+                <div className="part-detail sensor-led"></div>
+                <div className="part-detail sensor-led second"></div>
               </div>
-              <div className={`proto-part proto-base ${selected === 'base' ? 'selected' : ''} ${exploded ? 'exploded' : ''}`} onClick={() => setSelected('base')}>
-                Base
+
+              {/* Base de Fixação */}
+              <div 
+                className={`proto-part proto-base ${selected === 'base' ? 'selected' : ''} ${exploded ? 'exploded' : ''}`} 
+                onClick={() => setSelected('base')}
+              >
+                <div className="part-detail base-bolt bolt-1"></div>
+                <div className="part-detail base-bolt bolt-2"></div>
+                <div className="part-detail base-bolt bolt-3"></div>
+                <div className="part-detail base-bolt bolt-4"></div>
               </div>
             </div>
           </div>

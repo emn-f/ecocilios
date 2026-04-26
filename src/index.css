@@ -619,12 +619,12 @@ h1, h2, h3, h4, h5, h6 {
 .prototype-grid {
   display: grid;
   grid-template-columns: 1.2fr 0.8fr;
-  gap: 1rem;
+  gap: 1.5rem;
 }
 
 .prototype-stage-panel,
 .prototype-info-panel {
-  padding: 1.2rem;
+  padding: 1.5rem;
 }
 
 .prototype-toolbar {
@@ -633,7 +633,7 @@ h1, h2, h3, h4, h5, h6 {
   justify-content: space-between;
   gap: 0.7rem;
   flex-wrap: wrap;
-  margin-bottom: 0.8rem;
+  margin-bottom: 1rem;
 }
 
 .prototype-toolbar-tag {
@@ -666,20 +666,32 @@ h1, h2, h3, h4, h5, h6 {
 
 .prototype-stage {
   width: 100%;
-  min-height: 420px;
-  border-radius: 14px;
-  background:
-    radial-gradient(circle at 20% 20%, rgba(0, 210, 255, 0.12), transparent 45%),
-    radial-gradient(circle at 80% 70%, rgba(16, 185, 129, 0.1), transparent 45%),
-    #070d14;
+  min-height: 520px;
+  border-radius: 24px;
+  background: 
+    radial-gradient(circle at 50% 10%, rgba(56, 189, 248, 0.12), transparent 60%),
+    linear-gradient(to bottom, #080c14, #04060a);
   border: 1px solid var(--glass-border);
-  perspective: 1200px;
+  perspective: 2000px;
   display: flex;
   align-items: center;
   justify-content: center;
   user-select: none;
   overflow: hidden;
   cursor: grab;
+  position: relative;
+}
+
+.prototype-stage::after {
+  content: '';
+  position: absolute;
+  bottom: 80px;
+  width: 280px;
+  height: 50px;
+  background: radial-gradient(ellipse at center, rgba(0, 0, 0, 0.8), transparent 70%);
+  filter: blur(15px);
+  transform: rotateX(80deg);
+  pointer-events: none;
 }
 
 .prototype-stage:active {
@@ -687,10 +699,10 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .prototype-model {
-  width: 220px;
-  height: 280px;
+  width: 240px;
+  height: 320px;
   transform-style: preserve-3d;
-  transition: transform 0.15s ease-out;
+  transition: transform 0.1s ease-out;
   position: relative;
 }
 
@@ -698,74 +710,157 @@ h1, h2, h3, h4, h5, h6 {
   position: absolute;
   left: 50%;
   transform: translateX(-50%);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  color: #d9f6ff;
-  font-size: 0.78rem;
-  letter-spacing: 0.02em;
-  text-transform: uppercase;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: inset 0 0 18px rgba(255, 255, 255, 0.05), 0 8px 24px rgba(0, 0, 0, 0.35);
-  transition: transform 0.28s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+  transform-style: preserve-3d;
+  cursor: pointer;
+  transition: all 0.5s cubic-bezier(0.19, 1, 0.22, 1);
 }
 
-.proto-part.selected {
-  border-color: rgba(0, 210, 255, 0.9);
-  box-shadow: inset 0 0 18px rgba(0, 210, 255, 0.18), 0 0 20px rgba(0, 210, 255, 0.28);
+.part-detail {
+  position: absolute;
+  transform-style: preserve-3d;
 }
 
+/* --- TAMPA (Funnel Design) --- */
 .proto-top {
-  top: 18px;
-  width: 180px;
-  height: 52px;
-  border-radius: 24px;
-  background: linear-gradient(135deg, rgba(56, 189, 248, 0.55), rgba(14, 165, 233, 0.35));
-  transform: translateX(-50%) translateZ(30px);
+  top: 10px;
+  width: 200px;
+  height: 50px;
+  background: linear-gradient(135deg, #2d3748, #1a202c);
+  border-radius: 50% / 15px;
+  transform: translateX(-50%) translateZ(60px);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+  border: 1px solid rgba(255,255,255,0.1);
+}
+
+.lid-opening {
+  inset: 15px;
+  background: #000;
+  border-radius: 50%;
+  box-shadow: inset 0 0 15px rgba(56, 189, 248, 0.4);
+}
+
+.lid-rim {
+  inset: -2px;
+  border: 3px solid #4a5568;
+  border-radius: 50% / 15px;
 }
 
 .proto-top.exploded {
-  transform: translateX(-50%) translateY(-38px) translateZ(45px);
+  transform: translateX(-50%) translateY(-80px) translateZ(120px) rotateX(15deg);
 }
 
+/* --- CESTO (Mesh Design) --- */
 .proto-basket {
-  top: 72px;
-  width: 170px;
-  height: 122px;
-  border-radius: 24px;
-  background: linear-gradient(180deg, rgba(16, 185, 129, 0.32), rgba(16, 185, 129, 0.14));
-  transform: translateX(-50%) translateZ(14px);
+  top: 70px;
+  width: 180px;
+  height: 160px;
+  transform: translateX(-50%) translateZ(0px);
+}
+
+.basket-mesh {
+  inset: 0;
+  background: rgba(16, 185, 129, 0.1);
+  backdrop-filter: blur(2px);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  border-radius: 12px;
+  background-image: 
+    radial-gradient(circle at center, rgba(16, 185, 129, 0.3) 1px, transparent 1px);
+  background-size: 8px 8px;
+}
+
+.basket-frame {
+  inset: -1px;
+  border: 2px solid #10b981;
+  border-radius: 12px;
+  box-shadow: 0 0 15px rgba(16, 185, 129, 0.2);
 }
 
 .proto-basket.exploded {
-  transform: translateX(-50%) translateY(-6px) translateZ(20px);
+  transform: translateX(-50%) translateY(0px) translateZ(40px);
 }
 
+/* --- SENSOR (Tech Module) --- */
 .proto-sensor {
-  top: 206px;
-  width: 140px;
-  height: 34px;
-  border-radius: 10px;
-  background: linear-gradient(135deg, rgba(245, 158, 11, 0.55), rgba(245, 158, 11, 0.2));
-  transform: translateX(-50%) translateZ(18px);
+  top: 240px;
+  width: 100px;
+  height: 40px;
+  background: #1a202c;
+  border-radius: 6px;
+  transform: translateX(-50%) translateZ(45px);
+  border: 1px solid #4a5568;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.6);
+}
+
+.sensor-screen {
+  top: 8px; left: 10px; right: 10px; bottom: 8px;
+  background: #000;
+  border-radius: 3px;
+  border: 1px solid #2d3748;
+}
+
+.sensor-led {
+  top: 15px; right: 18px;
+  width: 6px; height: 6px;
+  background: #10b981;
+  border-radius: 50%;
+  box-shadow: 0 0 8px #10b981;
+  animation: pulse 1.5s infinite;
+}
+
+.sensor-led.second {
+  right: 28px;
+  background: #3b82f6;
+  box-shadow: 0 0 8px #3b82f6;
+  animation-delay: 0.5s;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(0.8); }
 }
 
 .proto-sensor.exploded {
-  transform: translateX(-50%) translateY(14px) translateZ(30px);
+  transform: translateX(-50%) translateY(60px) translateZ(90px);
 }
 
+/* --- BASE (Industrial Support) --- */
 .proto-base {
-  top: 246px;
-  width: 190px;
+  top: 290px;
+  width: 220px;
   height: 30px;
-  border-radius: 10px;
-  background: linear-gradient(135deg, rgba(100, 116, 139, 0.58), rgba(71, 85, 105, 0.24));
-  transform: translateX(-50%) translateZ(8px);
+  background: #2d3748;
+  border-radius: 4px;
+  transform: translateX(-50%) translateZ(-15px);
+  border: 1px solid #1a202c;
 }
+
+.base-bolt {
+  width: 10px; height: 10px;
+  background: radial-gradient(circle at 30% 30%, #718096, #2d3748);
+  border-radius: 50%;
+  border: 1px solid #1a202c;
+}
+
+.bolt-1 { top: 5px; left: 15px; }
+.bolt-2 { top: 5px; right: 15px; }
+.bolt-3 { bottom: 5px; left: 15px; }
+.bolt-4 { bottom: 5px; right: 15px; }
 
 .proto-base.exploded {
-  transform: translateX(-50%) translateY(34px) translateZ(16px);
+  transform: translateX(-50%) translateY(100px) translateZ(-30px);
 }
+
+/* --- Hover Effects --- */
+.proto-part:hover, .proto-part.selected {
+  filter: brightness(1.2);
+  z-index: 10;
+}
+
+.proto-part.selected {
+  border-color: var(--accent-main) !important;
+}
+
+
 
 .prototype-zoom {
   display: flex;
